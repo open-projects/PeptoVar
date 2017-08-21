@@ -1,0 +1,63 @@
+##gff-version   3
+testseq1	testDATA	gene	1	270	.	+	.	ID=gene:G0001;Name=G0001;biotype=protein_coding;gene_id=G0001
+testseq1	testDATA	transcript	1	270	.	+	.	ID=transcript:T0001;Parent=gene:G0001
+testseq1	testDATA	five_prime_UTR	1	10	.	+	.	Parent=transcript:T0001
+testseq1	testDATA	exon	11	100	.	+	.	Parent=transcript:T0001;Name=E1001;rank=1;version=1
+testseq1	testDATA	CDS	11	100	.	+	0	ID=CDS:P0001;Parent=transcript:T0001;protein_id=P0001
+testseq1	testDATA	exon	111	220	.	+	.	Parent=transcript:T0001;Name=E1002;rank=2;version=1
+testseq1	testDATA	CDS	111	220	.	+	0	ID=CDS:P0001;Parent=transcript:T0001;protein_id=P0001
+testseq1	testDATA	exon	231	261	.	+	.	Parent=transcript:T0001;Name=E1003;rank=3;version=1
+testseq1	testDATA	CDS	231	261	.	+	1	ID=CDS:P0001;Parent=transcript:T0001;protein_id=P0001
+testseq1	testDATA	three_prime_UTR	262	270	.	+	.	Parent=transcript:T0001
+testseq1	testDATA	transcript	100	270	.	+	.	ID=transcript:T0002;Parent=gene:G0001
+testseq1	testDATA	five_prime_UTR	100	110	.	+	.	Parent=transcript:T0002
+testseq1	testDATA	exon	111	220	.	+	.	Parent=transcript:T0002;Name=E1002;rank=1;version=1
+testseq1	testDATA	CDS	111	220	.	+	0	ID=CDS:P0002;Parent=transcript:T0002;protein_id=P0002
+testseq1	testDATA	exon	231	261	.	+	.	Parent=transcript:T0002;Name=E1003;rank=2;version=1
+testseq1	testDATA	CDS	231	261	.	+	1	ID=CDS:P0002;Parent=transcript:T0002;protein_id=P0002
+testseq1	testDATA	three_prime_UTR	262	270	.	+	.	Parent=transcript:T0002
+testseq2	testDATA	gene	1	270	.	-	.	ID=gene:G0003;Name=G0003;biotype=protein_coding;gene_id=G0003
+testseq2	testDATA	transcript	1	270	.	-	.	ID=transcript:T0003;Parent=gene:G0003
+testseq2	testDATA	three_prime_UTR	1	9	.	-	.	Parent=transcript:T0003
+testseq2	testDATA	exon	10	40	.	-	.	Parent=transcript:T0003;Name=E2001;rank=3;version=1
+testseq2	testDATA	CDS	10	40	.	-	1	ID=CDS:P0003;Parent=transcript:T0003;protein_id=P0003
+testseq2	testDATA	exon	51	160	.	-	.	Parent=transcript:T0003;Name=E2002;rank=2;version=1
+testseq2	testDATA	CDS	51	160	.	-	0	ID=CDS:P0003;Parent=transcript:T0003;protein_id=P0003
+testseq2	testDATA	exon	171	260	.	-	.	Parent=transcript:T0003;Name=E2003;rank=1;version=1
+testseq2	testDATA	CDS	171	260	.	-	0	ID=CDS:P0003;Parent=transcript:T0003;protein_id=P0003
+testseq2	testDATA	five_prime_UTR	261	270	.	-	.	Parent=transcript:T0003
+testseq2	testDATA	transcript	1	270	.	-	.	ID=transcript:T0004;Parent=gene:G0003
+testseq2	testDATA	three_prime_UTR	1	9	.	-	.	Parent=transcript:T0004
+testseq2	testDATA	exon	10	40	.	-	.	Parent=transcript:T0004;Name=E2001;rank=2;version=1
+testseq2	testDATA	CDS	10	40	.	-	1	ID=CDS:P0003;Parent=transcript:T0004;protein_id=P0003
+testseq2	testDATA	exon	51	160	.	-	.	Parent=transcript:T0004;Name=E2002;rank=1;version=1
+testseq2	testDATA	CDS	51	160	.	-	0	ID=CDS:P0003;Parent=transcript:T0004;protein_id=P0003
+testseq2	testDATA	five_prime_UTR	261	270	.	-	.	Parent=transcript:T0003
+##FASTA
+>testseq1
+NNNNNNNNNN
+ATGGAGCTGCGGGGCATGCGGTACCACCCA
+ATCGACATTGAGACCTCGGTCATCAGAGCC
+CATAAAAGCGTTACGGAATCCCGTGCTGTG
+NNNNNNNNNN
+TTTACCTGGACAAATTTGTTGGTGGTTGTG
+GTTGAGCTGGATGGGTCGGAACAAGAAGCC
+TTGGACCTGGTTCCCTTGGTGACCAACGTG
+GTCCTGGAGGAGCACTACCT
+NNNNNNNNNN
+GATCGTCGGAGTGGTGGTCGTGGTGGACTAA
+NNNNNNNNN
+>testseq2
+NNNNNNNNN
+TTAGTCCACCACGACCACCACTCCGACGATC
+NNNNNNNNNN
+AGGTAGTGCTCCTCCAGGACCACGTTGGTC
+ACCAAGGGAACCAGGTCCAAGGCTTCTTGT
+TCCGACCCATCCAGCTCAACCACAACCACC
+AACAAATTTGTCCAGGTAAA
+NNNNNNNNNN
+CACAGCACGGGATTCCGTAACGCTTTTATG
+GGCTCTGATGACCGAGGTCTCAATGTCGAT
+TGGGTGGTACCGCATGCCCCGCAGCTCCAT
+NNNNNNNNNN
+

@@ -1,0 +1,28 @@
+##fileformat=VCFv4.1
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+##INFO=<ID=AC,Number=A,Type=Integer,Description="Total number of alternate alleles in called genotypes">
+##INFO=<ID=AF,Number=A,Type=Float,Description="Estimated allele frequency in the range (0,1)">
+##INFO=<ID=NS,Number=1,Type=Integer,Description="Number of samples with data">
+##INFO=<ID=AN,Number=1,Type=Integer,Description="Total number of alleles in called genotypes">
+##INFO=<ID=DP,Number=1,Type=Integer,Description="Total read depth">
+##INFO=<ID=ssID,Number=A,Type=String,Description=dbSNP ssID of the allele">
+##INFO=<ID=ASP,Number=0,Type=Flag,Description="Is Assembly specific. This is set if the variant only maps to one assembly (dbSNP flag)">
+##INFO=<ID=MATCHED_REV,Number=0,Type=Flag,Description="The REF matched the - strand">
+##INFO=<ID=MATCHED_FWD,Number=0,Type=Flag,Description="The REF matched the + strand">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	SAMPLE01	SAMPLE02	SAMPLE03
+testseq1	11	rt0011	A	T	100	PASS	AC=50;AF=0.5;AN=100;NS=50;DP=500;ssID=st001;ASP;MATCHED_FWD	GT	0|0	1|1	0/1
+testseq1	12	rt0012	T	C	100	PASS	AC=60;AF=0.6;AN=100;NS=50;DP=500;ssID=st002;ASP;MATCHED_FWD	GT	0|0	1|1	.|.
+testseq1	16	rt0013	G	C	100	PASS	AC=1;AF=0.01;AN=100;NS=50;DP=500;ssID=st003;ASP;MATCHED_FWD	GT	0|0	1|1	.|1
+testseq1	17	rt0014	C	T	100	PASS	AC=90;AF=0.9;AN=100;NS=50;DP=500;ssID=st004;ASP;MATCHED_FWD	GT	0|0	1|1	0/1
+testseq1	110	rt0015	NT	N	100	PASS	AC=5;AF=0.05;AN=100;NS=50;DP=500;ssID=st005;ASP;MATCHED_FWD	GT	0|0	1|1	0|1
+testseq1	111	rt0016	T	TTATG	100	PASS	AC=1;AF=0.01;AN=100;NS=50;DP=500;ssID=st006;ASP;MATCHED_FWD	GT	0|0	1|1	0|1
+testseq1	220	rt0017	T	TATG	100	PASS	AC=3;AF=0.03;AN=100;NS=50;DP=500;ssID=st007;ASP;MATCHED_FWD	GT	0|0	1|1	0|1
+testseq1	232	rt0018	A	T,G,C	100	PASS	AC=25,25,25;AF=0.25,0.25,0.25;AN=100;NS=50;DP=500;ssID=st007;ASP;MATCHED_FWD	GT	0|1	1|2	2|3
+testseq2	39	rt0028	T	A,C,G	100	PASS	AC=25,25,25;AF=0.25,0.25,0.25;AN=100;NS=50;DP=500;ssID=st007;ASP;MATCHED_FWD	GT	0|1	1|2	2|3
+testseq2	50	rt0027	N	NCAT	100	PASS	AC=3;AF=0.03;AN=100;NS=50;DP=500;ssID=st007;ASP;MATCHED_FWD	GT	0|0	1|1	0|1
+testseq2	159	rt0026	A	ACATA	100	PASS	AC=1;AF=0.01;AN=100;NS=50;DP=500;ssID=st006;ASP;MATCHED_FWD	GT	0|0	1|1	0|1
+testseq2	159	rt0025	AA	A	100	PASS	AC=5;AF=0.05;AN=100;NS=50;DP=500;ssID=st005;ASP;MATCHED_FWD	GT	0|0	1|1	0|1
+testseq2	254	rt0024	G	A	100	PASS	AC=90;AF=0.9;AN=100;NS=50;DP=500;ssID=st004;ASP;MATCHED_FWD	GT	0|0	1|1	0/1
+testseq2	255	rt0023	C	G	100	PASS	AC=1;AF=0.01;AN=100;NS=50;DP=500;ssID=st003;ASP;MATCHED_FWD	GT	0|0	1|1	.|1
+testseq2	259	rt0022	A	G	100	PASS	AC=60;AF=0.6;AN=100;NS=50;DP=500;ssID=st002;ASP;MATCHED_FWD	GT	0|0	1|1	.|.
+testseq2	260	rt0021	T	A	100	PASS	AC=50;AF=0.5;AN=100;NS=50;DP=500;ssID=st001;ASP;MATCHED_FWD	GT	0|0	1|1	0/1
