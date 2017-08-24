@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 # Copyright (C) 2017 D. Malko
-# This file is part of PeptoVar (Peptides on Variations): the program for personalization of protein coding genes and population-wide peptidome generation.
+# This file is part of PeptoVar (Peptides of Variations): the program for personalized and population-wide peptidome generation.
 #
 # PeptoVar is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -89,7 +89,7 @@ class Allele:
 # end of Allele
 
 class SNP:
-    def __init__(self, snp, samples, optimization):
+    def __init__(self, snp, samples, optimization, tag_af = 'AF'):
         if hasattr(snp, 'info'): # normalization
             if 'MATCHED_REV' in snp.info:
                 if snp.info['MATCHED_REV'] == True:
@@ -114,13 +114,13 @@ class SNP:
         
         ref_af = -1
         if hasattr(snp, 'info'):
-            if 'AF' in snp.info: # according to VCF file description allele frequency (AF) specified ONLY for alternative alleles
-                if len(snp.alts) == len(snp.info['AF']):
+            if tag_af in snp.info: # according to VCF file description allele frequency (AF) specified ONLY for alternative alleles
+                if len(snp.alts) == len(snp.info[tag_af]):
                     ref_af = 1
                     alt_alleles = []
                     for i, allele in enumerate(snp.alts):
                         if allele == snp.ref: continue
-                        af = round(float(snp.info['AF'][i]), 4)
+                        af = round(float(snp.info[tag_af][i]), 4)
                         ref_af -= af # AF for reference allele should be calculated
                         new_allele = Allele(snp.id, allele, self.strand, af)
                         if not optimization:
