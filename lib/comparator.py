@@ -42,6 +42,10 @@ class UniPep:
         
         self._con = sqlite3.connect(self._filename)
         self._cur = self._con.cursor()
+        
+        self._cur.execute("PRAGMA page_size = 65536")
+        self._cur.execute("PRAGMA max_page_count = 2147483646")
+        
         self._cur.execute("CREATE TABLE pept1 (chrom TEXT NOT NULL, transcript_id TEXT NOT NULL, sample TEXT NOT NULL, allele1 integer NOT NULL, allele2 integer NOT NULL, beg INTEGER NOT NULL, end INTEGER NOT NULL, fshifts TEXT NOT NULL, snp TEXT NOT NULL, peptide TEXT, matrix TEXT NOT NULL)")
         #self._cur.execute("CREATE INDEX peptide1 ON pept1 (peptide)")
         self._cur.execute("CREATE TABLE pept2 (chrom TEXT NOT NULL, transcript_id TEXT NOT NULL, sample TEXT NOT NULL, allele1 integer NOT NULL, allele2 integer NOT NULL, beg INTEGER NOT NULL, end INTEGER NOT NULL, fshifts TEXT NOT NULL, snp TEXT NOT NULL, peptide TEXT, matrix TEXT NOT NULL)")
