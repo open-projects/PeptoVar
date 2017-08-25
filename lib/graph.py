@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# Copyright (C) 2017 D. Malko
+# Copyright (C) 2017 Dmitry Malko
 # This file is part of PeptoVar (Peptides of Variations): the program for personalized and population-wide peptidome generation.
 #
 # PeptoVar is free software: you can redistribute it and/or modify
