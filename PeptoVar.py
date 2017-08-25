@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# Copyright (C) 2017 D. Malko
+# Copyright (C) 2017 Dmitry Malko
 # This file is part of PeptoVar (Peptides of Variations): the program for personalized and population-wide peptidome generation.
 #
 # PeptoVar is free software: you can redistribute it and/or modify
@@ -53,7 +53,7 @@ def main():
     input_parser.add_argument('-vcf', metavar='file.vcf.gz', default=None, help='bgzip-compressed VCF input file (need an index file)', required=False)
     input_parser.add_argument('-tmpdir', metavar='dirpath', default=None, help='TEMP directory', required=False)
     input_parser.add_argument('-samples', metavar='name', nargs='+', default=list(), help='a sample name or a pair of sample names in VCF file; for two samples (donor/recipient) only unique peptides will be represented)', required=False)
-    input_parser.add_argument('-tagaf', metavar='TAG_AF', default='AF', help='allele frequency tag in VCF file (for example: EUR_AF, SAS_AF, AMR_AF etc.); used with `-minaf` argument, default=AF', required=False)
+    input_parser.add_argument('-tagaf', metavar='TAG_AF', default='AF', help='allele frequency tag in VCF file (for example: EUR_AF, SAS_AF, AMR_AF etc.); use with `-minaf` argument, default=AF', required=False)
     input_parser.add_argument('-minaf', metavar='THRESHOLD', type=float, default=0, help='allele frequency (AF) threshold; alleles with AF < THRESHOLD will be ignored (AF=0 will be set for alleles with no data)', required=False)
     input_parser.add_argument('-var', metavar='all | used', choices=['all', 'used'], help='save translated polymorphisms (all or only used to make peptides)', required=False)
     input_parser.add_argument('-nopt', action='store_false', default=True, help='do not use optimization (may cause high CPU load and memory usage)')
@@ -89,6 +89,9 @@ def main():
     
     peptdb = None
     protdb = None
+    
+    if not min_af:
+        cprint.printWarning("\nLow value of -minaf argument can cause high memory usage and increasing computational time!\n")
     
     if tmp_dir and not os.path.exists(tmp_dir):
         try:
@@ -134,7 +137,7 @@ def main():
     
     if len(samples) == 0:
         samples.append('virtual')
-        cprint.printWarning('MODE: virtual sample')
+        cprint.printWarning('MODE: population')
         peptdb = UniPep(samples[0], '-', tmp_dir)
         protdb = UniPep(samples[0], '-', tmp_dir)
     elif len(samples) == 1:
