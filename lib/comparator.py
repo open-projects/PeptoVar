@@ -65,11 +65,23 @@ class UniPep:
     
     def getUnique(self, sample_name):
         self._cur.execute(self.names[sample_name]['unique'])
-        return self._cur.fetchall()
+        #return self._cur.fetchall()
+        while True:
+            rows = self._cur.fetchmany(1000)
+            if not rows:
+                return None
+            yield rows
+        return None
     
     def getAll(self, sample_name):
         self._cur.execute(self.names[sample_name]['allpep'])
-        return self._cur.fetchall()
+        #return self._cur.fetchall()
+        while True:
+            rows = self._cur.fetchmany(1000)
+            if not rows:
+                return None
+            yield rows
+        return None
     
     def close(self):
         self._con.close()

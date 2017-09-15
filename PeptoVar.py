@@ -351,7 +351,9 @@ def main():
             else:
                 output = peptdb.getAll(sample)
             for rec in output:
-                outfiles.writePeptide(rec)
+                if not rec: break
+                for row in rec:
+                    outfiles.writePeptide(row)
         peptdb.close()
     
     if do_prot:
@@ -363,7 +365,9 @@ def main():
             else:
                 output = protdb.getAll(sample)
             for rec in output:
-                outfiles.writeProtein(rec)
+                if not rec: break
+                for row in rec:
+                    outfiles.writeProtein(row)
         protdb.close()
     
     notfound = set()
