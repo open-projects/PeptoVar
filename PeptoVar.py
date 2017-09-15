@@ -93,13 +93,18 @@ def main():
     if not min_af:
         cprint.printWarning("\nLow value of -minaf argument can cause high memory usage and increasing computational time!\n")
     
-    if tmp_dir and not os.path.exists(tmp_dir):
-        try:
-            os.makedirs(tmp_dir)
-        except OSError as e:
-            if e.errno != errno.EEXIST:
-                cprint.printFail("\nCan't create a temporary directory!\n")
-            
+    tmpdir_created = 0
+    if tmp_dir:
+        if not os.path.exists(tmp_dir):
+            try:
+                os.makedirs(tmp_dir)
+            except OSError as e:
+                if e.errno != errno.EEXIST:
+                    cprint.printFail("\nCan't create a temporary directory!\n")
+                    exit()
+            tmpdir_created = 1
+        os.environ["TMPDIR"] = tmp_dir
+        os.environ["SQLITE_TMPDIR"] = tmp_dir
     
     for plength in pept_len:
         if plength < 0:
@@ -372,7 +377,7 @@ def main():
     
     stop_time = time.time()
     cprint.printOk("...the job is done (execution time: {})".format(time.strftime("%H:%M:%S", time.gmtime(stop_time - start_time))))
-    if tmp_dir and os.path.exists(tmp_dir):
+    if tmpdir_created and os.path.exists(tmp_dir):
         try:
             shutil.rmtree(tmp_dir)
         except:
