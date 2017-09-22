@@ -30,7 +30,7 @@ class Node:
         self._vertebra = None # reference to the master vertebra
         self._allele_id = allele.id if allele else 'ref'
         self._alleles = [allele] if allele else [] # alleles of variations
-        self._is_fshift = True if allele and allele.isInDel() else False # True if the node belongs to a frameshift
+        self._is_fshift = True if allele and allele.isFrameShift() else False # True if the node belongs to a frameshift
         self._fshift_path = {}
         self._is_used = False # True if the node has been used
         self._prefix_seq = set()

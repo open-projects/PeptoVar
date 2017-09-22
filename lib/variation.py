@@ -112,6 +112,9 @@ class SNP:
         if not optimization:
             self.ref.setNonSyn()
         
+        if not hasattr(snp, 'alts') or snp.alts is None or len(snp.alts) < 1:
+            raise ValueError("no alternative alleles for variation {}".format(snp.id))
+        
         ref_af = -1
         if hasattr(snp, 'info'):
             if tag_af in snp.info: # according to VCF file description allele frequency (AF) specified ONLY for alternative alleles

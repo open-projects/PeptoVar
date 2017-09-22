@@ -268,9 +268,6 @@ def main():
                             continue
                         
                         if snp.filterAF(min_af):
-                            if DEBUG and snp.id == 'rs529174822;rs563866452' or snp.id == 'rs72331392':
-                                bp=1
-                            
                             try:
                                 exon.modify(snp)
                             except ValueError as err:
