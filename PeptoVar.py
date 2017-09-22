@@ -304,9 +304,9 @@ def main():
                     print("variation processing...")
                     for trn_var in trnVariations:
                         if optimization:
-                            outfiles.writeVariation(transcript.id, trn_var, save_var)
+                            outfiles.writeVariation(transcript.chrom, transcript.id, trn_var, save_var)
                         else:
-                            outfiles.writeVariation(transcript.id, trn_var)
+                            outfiles.writeVariation(transcript.chrom, transcript.id, trn_var)
                 
                 if do_prot:
                     print("protein processing...")

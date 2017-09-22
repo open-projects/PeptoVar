@@ -99,10 +99,10 @@ class OutFileContainer:
         outfile = self._files_pept[sample_name]
         outfile.writeCSV(peptide_rec)
     
-    def writeVariation(self, transcript_id, trn_var, mode = None):
+    def writeVariation(self, chrom, transcript_id, trn_var, mode = None):
         if not self._file_var:
             self._file_var = OutFile(self._path, 'variations.csv')
-            self._file_var.writeCSV(('transcript_id', 'variation_id', 'beg', 'end', 'allele_id', 'sample', 'sample_allele_1', 'sample_allele_2', 'synonymous', 'upstream_fshifts', 'prefix_alleles', 'prefix', 'allele', 'suffix', 'suffix_alleles', 'translation'))
+            self._file_var.writeCSV(('chrom', 'transcript_id', 'variation_id', 'beg', 'end', 'allele_id', 'sample', 'sample_allele_1', 'sample_allele_2', 'synonymous', 'upstream_fshifts', 'prefix_alleles', 'prefix', 'allele', 'suffix', 'suffix_alleles', 'translation'))
         outfile = self._file_var
         
         var_id = trn_var.id
@@ -128,7 +128,7 @@ class OutFileContainer:
                     prefix_fsh = '|'.join(fshift_id for fshift_id in prefix.getFShiftPathSet())
                     prefix_var = '|'.join(prefix.getAllelesID())
                     suffix_var = '|'.join(suffix.getAllelesID())
-                    data = (transcript_id, var_id, str(beg), str(end), trn_allele.id, prefix.sample.name, str(prefix.sample.allele_1), str(prefix.sample.allele_2), str(syn), prefix_fsh, prefix_var, prefix.seq, allele_seq, suffix.seq, suffix_var, trn_allele.trn)
+                    data = (chrom, transcript_id, var_id, str(beg), str(end), trn_allele.id, prefix.sample.name, str(prefix.sample.allele_1), str(prefix.sample.allele_2), str(syn), prefix_fsh, prefix_var, prefix.seq, allele_seq, suffix.seq, suffix_var, trn_allele.trn)
                     data_str = '_'.join(data)
                     if data_str not in wrote_data:
                         outfile.writeCSV(data)
