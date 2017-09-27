@@ -267,10 +267,55 @@ class Fibro(Vertebra):
 # end of Fibro    
 
 class Codon:
-    def __init__(self, nodes):
-        self.nodes = nodes
-        self.codon = nodes[0].nucl + nodes[1].nucl + nodes[2].nuc
-        self.aa = translate(self.codon)[0]
+    def __init__(self, node = None):
+        self._nodes = [node] if node else []
+        self._length = 1 if node and node.nucl != '-' else 0
+    
+    def length(self):
+        return self._length
+    
+    def getNodes(self):
+        return self._nodes
+    
+    def getLast(self):
+        return self._nodes[-1] if len(self._nodes) else None
+    
+    def append(self, node):
+        self._nodes.append(node)
+        if node.nucl != '-':
+            self._length += 1
+        return self._length
+    
+    def extend(self, ext_node):
+        new_codon = Codon()
+        for node in self.getNodes():
+            new_codon.append(node)
+        new_codon.append(ext_node)
+        return new_codon
+    
+    def getUpstreamNodes(self):
+        return self._nodes[:-1]
+    
+    def isStopCodon(self):
+        codon = ''
+        for node in self._nodes:
+            if node.nucl != '-':
+                nucl = node.nucl.upper()
+                if len(codon) == 0 and nucl != 'T':
+                    return False
+                codon += nucl
+        if codon == 'TAA' or codon == 'TAG' or codon == 'TGA':
+            return True
+        return False
+    
+    def getNuclNode(self, num):
+        n = 0
+        for node in self._nodes:
+            if node.nucl != '-':
+                n += 1
+                if n == num:
+                    return node
+        return None
 # end of Codon
 
 class CodonPrefix:
@@ -279,10 +324,14 @@ class CodonPrefix:
         self.seq = ""
         self.sample = sample
         self._fsh_path_set = set()
-        self.nodes = nodes
-        if len(nodes):
-            self.id = "-".join(str(id(node)) for node in nodes)
-            self.seq = "".join(node.nucl.lower() for node in nodes)
+        self.nodes = []
+        self.path = nodes
+        for node in nodes:
+            if node.nucl != '-':
+                self.nodes.append(node)
+        if len(self.nodes):
+            self.id = "-".join(str(id(node)) for node in self.nodes)
+            self.seq = "".join(node.nucl.lower() for node in self.nodes)
             self._setFShiftPathSet(self.nodes[0])
         
     def _setFShiftPathSet(self, node):
@@ -290,7 +339,7 @@ class CodonPrefix:
         
     def getAllelesID(self):
         ids = []
-        for node in self.nodes:
+        for node in self.path:
             for allele in node.getAlleles():
                 if not allele.isNonSyn():
                     allele_id = '[' + allele.id + ']'
@@ -315,7 +364,20 @@ class CodonSuffix (CodonPrefix):
         super().__init__(sample, nodes)
     
     def getTrimmed(self, length = 0):
-        return CodonSuffix(self.sample, self.nodes[:length])
+        n = 0
+        path = []
+        if length:
+            for node in self.path:
+                if node.nucl != '-':
+                    n += 1
+                if n <= length:
+                    path.append(node)
+                if n == length:
+                    break
+        if n != length:
+            raise ValueError("failure to trimm codon suffix (wrong node number)")
+        return CodonSuffix(self.sample, path)
+            
 # end of CodonSuffix
 
 class CodonEmptySuffix(CodonSuffix):

@@ -18,7 +18,7 @@
 
 from lib.exon import Exon
 from lib.sample import Sample
-from lib.graph import Node, Fibro, FShiftPath, CodonEmptyPrefix, CodonPrefix, CodonEmptySuffix
+from lib.graph import Node, Fibro, FShiftPath, CodonEmptyPrefix, CodonPrefix, CodonEmptySuffix, Codon
 from lib.trnvariation import TrnAllele, TrnVariation
 from lib.peptide import Peptide, PeptideDriver
 from lib.seqtools import translate, complement, is_stopcodon
@@ -202,39 +202,40 @@ class Transcript:
             if node1.isUsed() or not node1.getSample(sample):
                 return next_nodes # STOP - the node have been used with other path or the node is not in the sample path
             
-            node1.attachPrefix(CodonEmptyPrefix(sample, node1))
-            vertebra1 = node1.getVertebra()
-            if vertebra1:
-                vertebra1.appendSample(sample)
-            
             if node1.nucl == '-':
-                next_nodes = node1.getNext(sample)
-                return next_nodes
+                vertebra1 = node1.getVertebra()
+                if vertebra1:
+                    vertebra1.appendSample(sample)
+                return node1.getNext(sample)
             
-            nodes2 = node1.getNext(sample) # the second nucleotide
-            while len(nodes2):
-                new_nodes2 = []
-                for node2 in nodes2:
-                    node2.attachPrefix(CodonPrefix(sample, [node1]))
-                    vertebra2 = node2.getVertebra()
-                    if vertebra2:
-                        vertebra2.appendSample(sample)
-                    if node2.nucl == '-':
-                        new_nodes2.extend(node2.getNext(sample))
-                        continue
-                    nodes3 = node2.getNext(sample)
-                    while len(nodes3):
-                        new_nodes3 = []
-                        for node3 in nodes3: # the third nucleotide
-                            node3.attachPrefix(CodonPrefix(sample, [node1, node2]))
-                            vertebra3 = node3.getVertebra()
-                            if vertebra3:
-                                vertebra3.appendSample(sample)
-                            if node3.nucl == '-':
-                                new_nodes3.extend(node3.getNext(sample))
-                                continue
+            codons = [Codon(node1)]
+            while len(codons):
+                new_codons = []
+                for codon in codons:
+                    last_node = codon.getLast()
+                    vertebra = last_node.getVertebra()
+                    if vertebra:
+                        vertebra.appendSample(sample)
+                    
+                    if last_node.nucl == '-':
+                        for next_node in last_node.getNext(sample):
+                            new_codons.append(codon.extend(next_node))
+                    else:
+                        if codon.length() == 1:
+                            last_node.attachPrefix(CodonEmptyPrefix(sample, last_node))
+                            for next_node in last_node.getNext(sample):
+                                new_codons.append(codon.extend(next_node))
+                        elif codon.length() == 2:
+                            last_node.attachPrefix(CodonPrefix(sample, codon.getUpstreamNodes()))
+                            for next_node in last_node.getNext(sample):
+                                new_codons.append(codon.extend(next_node))
+                        elif codon.length() == 3:
+                            last_node.attachPrefix(CodonPrefix(sample, codon.getUpstreamNodes()))
                             
                             if DEBUG:
+                                node1 = codon.getNuclNode(1)
+                                node2 = codon.getNuclNode(2)
+                                node3 = codon.getNuclNode(3)
                                 alleles1 = ",".join(allele.id for allele in node1.getAlleles())
                                 alleles2 = ",".join(allele.id for allele in node2.getAlleles())
                                 alleles3 = ",".join(allele.id for allele in node3.getAlleles())
@@ -242,14 +243,12 @@ class Transcript:
                                 if node1.pos == 152312604 or node2.pos == 152312604 or node3.pos == 152312604:
                                     bp=1
                             
-                            if is_stopcodon(node1.nucl + node2.nucl + node3.nucl):
+                            if codon.isStopCodon():
                                 continue # there is no reason to attach prefixes to untranslated codons
-                            next_nodes.extend(node3.getNext(sample))
-                        nodes3 = new_nodes3
-                nodes2 = new_nodes2
+                            next_nodes.extend(last_node.getNext(sample))
+                codons = new_codons
             node1.setUsed() # mark the node as `used`
             self._used_nodes.append(node1) # save used nodes to clean the marks before the next run
-            
             return next_nodes
         
         tree = self._graph_start.getNext(sample)
