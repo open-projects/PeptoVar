@@ -117,13 +117,16 @@ class SNP:
         
         ref_af = -1
         if hasattr(snp, 'info'):
-            if tag_af in snp.info: # according to VCF file description allele frequency (AF) specified ONLY for alternative alleles
-                if len(snp.alts) == len(snp.info[tag_af]):
+            if tag_af in snp.info: # according to VCF file description allele frequency (AF) specified ONLY for alternative alleles...
+                tag_array = snp.info[tag_af]
+                if len(snp.alts) + 1 == len(tag_array): # ... but dbSNP reports AF for ALL alleles (the first one is a reference allele)
+                    tag_array = tag_array[1:]
+                if len(snp.alts) == len(tag_array):
                     ref_af = 1
                     alt_alleles = []
                     for i, allele in enumerate(snp.alts):
                         if allele == snp.ref: continue
-                        af = round(float(snp.info[tag_af][i]), 4)
+                        af = round(float('.0' if tag_array[i] == '.' else tag_array[i]), 4)
                         ref_af -= af # AF for reference allele should be calculated
                         new_allele = Allele(snp.id, allele, self.strand, af)
                         if not optimization:
