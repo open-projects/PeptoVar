@@ -61,7 +61,7 @@ def main():
     input_parser.add_argument('-outdir', metavar='dirpath', default='./output', help='output directory (will be created if not exists, default=./output)', required=False)
     input_parser.add_argument('-indir', metavar='dirpath', default=None, help='input directory for files *.vcf.gz, *.vcf.gz.tbi, *.gff and *.fasta - if no sequences in GFF file; the files MUST have the same name for each locus (chromosome)', required=False)
     input_parser.add_argument('-trnlist', metavar='transcriptID', nargs='+', default=list(), help='list of transcriptID for processing', required=False)
-    input_parser.add_argument('-trnfile', metavar='transcriptID.txt', default=None, help='one column text file with the transcriptID list for processing', required=False)
+    input_parser.add_argument('-trnfile', metavar='transcriptID.txt', default=None, help='one columannotationn text file with the transcriptID list for processing', required=False)
     if DEBUG:
         input_parser.add_argument('-seq', metavar='file.data', default=None, help='DATA input file', required=False)
     
@@ -80,6 +80,7 @@ def main():
     pept_len = args.peptlen
     pept_len.sort()
     do_prot = False
+    mode = 'MODE: annotation' if save_var else None
     if len(pept_len) and pept_len[0] == 0:
         do_prot = True
         pept_len.pop(0)
@@ -142,20 +143,30 @@ def main():
     
     if len(samples) == 0:
         samples.append('virtual')
-        cprint.printWarning('MODE: population')
+        if mode:
+            mode += ' + population'
+        else:
+            mode = 'MODE: population'
         peptdb = UniPep(samples[0], '-', tmp_dir)
         protdb = UniPep(samples[0], '-', tmp_dir)
     elif len(samples) == 1:
-        cprint.printWarning('MODE: sample {}'.format(samples[0]))
+        if mode:
+            mode += ' + sample {}'.format(samples[0])
+        else:
+            mode = 'MODE: sample {}'.format(samples[0])
         peptdb = UniPep(samples[0], '-', tmp_dir)
         protdb = UniPep(samples[0], '-', tmp_dir)
     elif len(samples) == 2:
-        cprint.printWarning('MODE: transplantation')
+        if mode:
+            mode += ' + transplantation'
+        else:
+            mode = 'MODE: transplantation'
         peptdb = UniPep(samples[0], samples[1], tmp_dir)
         protdb = UniPep(samples[0], samples[1], tmp_dir)
     else:
         cprint.printFail("\nCan't take more than two samples\n")
         exit()
+    cprint.printWarning(mode)
     
     input_bulk = []
     if vcf_file:
