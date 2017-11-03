@@ -50,7 +50,7 @@ def main():
     input_parser = argparse.ArgumentParser(description='PeptoVar - Peptides on Variations: the program for personalization of protein coding genes and population-wide peptidome generation.')
     input_parser.add_argument('-gff', metavar='file.gff', default=None, help='GFF input file', required=False)
     input_parser.add_argument('-fasta', metavar='file.fasta', default=None, help='FASTA input file', required=False)
-    input_parser.add_argument('-vcf', metavar='file.vcf.gz', default=None, help='bgzip-compressed VCF input file (need an index file)', required=False)
+    input_parser.add_argument('-vcf', metavar='file.vcf.gz', default=None, help='bgzip-compressed VCF input file (must be indexed with tabix)', required=False)
     input_parser.add_argument('-tmpdir', metavar='dirpath', default=None, help='TEMP directory', required=False)
     input_parser.add_argument('-samples', metavar='name', nargs='+', default=list(), help='a sample name or a pair of sample names in VCF file; for two samples (donor/recipient) only unique peptides will be represented)', required=False)
     input_parser.add_argument('-tagaf', metavar='TAG_AF', default='AF', help='allele frequency tag in VCF file (for example: EUR_AF, SAS_AF, AMR_AF etc.); use with `-minaf` argument, default=AF', required=False)
@@ -60,8 +60,11 @@ def main():
     input_parser.add_argument('-peptlen', metavar='LENGTH', nargs='+', type=int, default=list(), help='lengths of peptides (0 - full-length proteins)', required=False)
     input_parser.add_argument('-outdir', metavar='dirpath', default='./output', help='output directory (will be created if not exists, default=./output)', required=False)
     input_parser.add_argument('-indir', metavar='dirpath', default=None, help='input directory for files *.vcf.gz, *.vcf.gz.tbi, *.gff and *.fasta - if no sequences in GFF file; the files MUST have the same name for each locus (chromosome)', required=False)
-    input_parser.add_argument('-trnlist', metavar='transcriptID', nargs='+', default=list(), help='list of transcriptID for processing', required=False)
-    input_parser.add_argument('-trnfile', metavar='transcriptID.txt', default=None, help='one columannotationn text file with the transcriptID list for processing', required=False)
+    input_parser.add_argument('-trnlist', metavar='transcriptID', nargs='+', default=list(), help='the transcriptID list for processing', required=False)
+    input_parser.add_argument('-trnfile', metavar='transcriptID.txt', default=None, help='one column text file with the transcriptID list for processing', required=False)
+    input_parser.add_argument('-trnexclist', metavar='transcriptID', nargs='+', default=list(), help='the EXCLUDED transcriptID list', required=False)
+    input_parser.add_argument('-trnexclfile', metavar='transcriptID.excl.txt', default=None, help='one column text file with the EXCLUDED transcriptID list', required=False)
+    
     if DEBUG:
         input_parser.add_argument('-seq', metavar='file.data', default=None, help='DATA input file', required=False)
     
@@ -77,6 +80,8 @@ def main():
     tag_af = args.tagaf
     trnlist = args.trnlist
     trnfile = args.trnfile
+    trnexclist = args.trnexclist
+    trnexclfile = args.trnexclfile
     pept_len = args.peptlen
     pept_len.sort()
     do_prot = False
@@ -128,6 +133,7 @@ def main():
         exit()
     
     transcript_set = {}
+    transcript_exclset = {}
     transcript_num = 0
     if trnfile:
         with open(trnfile, "r") as trnlistfile:
@@ -140,6 +146,22 @@ def main():
     for trnid in trnlist:
         transcript_set[trnid] = 0
         transcript_num += 1
+        
+    if trnexclfile:
+        with open(trnexclfile, "r") as trnlistfile:
+            for line in trnlistfile:
+                trnid = line.strip()
+                if len(trnid) > 0:
+                    transcript_exclset[trnid] = 0
+                    if trnid in transcript_set:
+                        del transcript_set[trnid]
+                        transcript_num -= 1
+        trnlistfile.close()
+    for trnid in trnexclist:
+        transcript_exclset[trnid] = 0
+        if trnid in transcript_set:
+            del transcript_set[trnid]
+            transcript_num -= 1
     
     if len(samples) == 0:
         samples.append('virtual')
@@ -224,6 +246,9 @@ def main():
         
         for trn_id in gff.getTranscriptsID():
             try:
+                if len(transcript_exclset):
+                    if trn_id in transcript_exclset:
+                        continue
                 if len(transcript_set):
                     if trn_id not in transcript_set:
                         continue
