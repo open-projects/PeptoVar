@@ -82,7 +82,7 @@ class Gff:
                         return
                     elif not re.match("#", line):
                         line = line.rstrip()
-                        fields = line.split()
+                        fields = line.split('\t')
                         if len(fields) == 9 and fields[2] == 'CDS':
                             item = gffItem(fields)
                             if item.parent_id:
