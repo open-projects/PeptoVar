@@ -64,6 +64,8 @@ def main():
     input_parser.add_argument('-trnfile', metavar='transcriptID.txt', default=None, help='one column text file with the transcriptID list for processing', required=False)
     input_parser.add_argument('-trnexclist', metavar='transcriptID', nargs='+', default=list(), help='the EXCLUDED transcriptID list', required=False)
     input_parser.add_argument('-trnexclfile', metavar='transcriptID.excl.txt', default=None, help='one column text file with the EXCLUDED transcriptID list', required=False)
+    input_parser.add_argument('-across', action='store_true', default=False, help='translate across stop codons')
+    input_parser.add_argument('-frame', metavar='0 | 1 | 2', type=int, default=0, choices=[0, 1, 2], help='frame of translation; 0 - is default', required=False)
     
     if DEBUG:
         input_parser.add_argument('-seq', metavar='file.data', default=None, help='DATA input file', required=False)
@@ -82,6 +84,8 @@ def main():
     trnfile = args.trnfile
     trnexclist = args.trnexclist
     trnexclfile = args.trnexclfile
+    across = args.across
+    frame = args.frame
     pept_len = args.peptlen
     pept_len.sort()
     do_prot = False
@@ -224,7 +228,7 @@ def main():
             continue
         
         try:
-            gff = Gff(fileset['gff'], tmp_dir)
+            gff = Gff(fileset['gff'], frame, tmp_dir)
         except ValueError as err:
             cprint.printWarning("{} - {} ...skipped".format(fileset['gff'], err.args[0]))
             outfiles.writeWarning([fileset['gff'], err.args[0], "skipped"])
@@ -256,7 +260,7 @@ def main():
                     transcript_num -= 1
                 
                 total_tr += 1
-                transcript = Transcript(trn_id)
+                transcript = Transcript(across, trn_id)
                 transcript.setSamples(samples)
                 
                 debugseq = None
