@@ -4,20 +4,18 @@ PeptoVar - **Pept**ides **o**f **Var**iations
 
 ## Overview
 
-PeptoVar is a program for personalized and population-wide peptidome generation.
+PeptoVar is a program for annotation of genomic variants in protein coding genes and generation of variant peptides.
 
- - Easy to use (see *Usage* section).
- 
- - Generate peptidomes:
-   - personalized for a sample
+- Annotation of variants:
+   - comprehensive information of potential compound effects of combining alternate alleles across multiple variant loci
+
+- Variant peptides:
+   - variant peptides of a population
+   - personalized peptidome for a sample (phased and unphased data can be used)
    - unique peptides for a pair of samples
-   - all possible peptides for variations in population
 
-- Translate variations with prefixes and suffixes:
-   - determine variation synonymy
-   - create translation dependencies
 
-- Has optional parameters for variation filtration and transcript selection.
+## The program was developed under the research project supported by RFBR according to the project number 17-04-02186.
 
 ## Requirements
 
@@ -37,37 +35,47 @@ PeptoVar is a program for personalized and population-wide peptidome generation.
   * or add symbolic link for ``PeptoVar`` script to your ``bin`` folder
   * or use PeptoVar directly by specifying full path to the executable script
 
-## Usage
+## Examples of usage
 
-#### Peptides for a sample
-This example illustrates usage for sample SAMPLE01:
+#### Annotation of variations
+The example of annotation of genomic variations in the protein coding regions:
 
-    PeptoVar -samples SAMPLE01 -peptlen 9 -var used -gff ./testdata/test.gff -vcf ./testdata/test.vcf.gz
+    PeptoVar -var nonsyn -gff ./testdata/test.gff -vcf ./testdata/test.vcf.gz
     
 or
     
-    PeptoVar -samples SAMPLE01 -peptlen 9 -var used -indir ./testdata
-
-
-#### Unique peptides for a pair of samples
-This example illustrates usage for the pair of samples: SAMPLE01 and SAMPLE02:
-
-    PeptoVar -samples SAMPLE01 SAMPLE02 -peptlen 9 -var used -gff ./testdata/test.gff -vcf ./testdata/test.vcf.gz
-    
-or
-    
-    PeptoVar -samples SAMPLE01 SAMPLE02 -peptlen 9 -var used -indir ./testdata
+    PeptoVar -var nonsyn -indir ./testdata
 
 
 #### Peptides for combinations of variations in the set
 This example illustrates usage virtual sample with all variations:
 
-    PeptoVar -peptlen 9 -var used -gff ./testdata/test.gff -vcf ./testdata/test.vcf.gz
+    PeptoVar -peptlen 9 10 11 -gff ./testdata/test.gff -vcf ./testdata/test.vcf.gz
     
 or
     
-    PeptoVar -peptlen 9 -var used -indir ./testdata
+    PeptoVar -peptlen 9 10 11 -indir ./testdata
     
+
+#### Peptides for a sample
+This example illustrates usage for sample SAMPLE01:
+
+    PeptoVar -samples SAMPLE01 -peptlen 9 -gff ./testdata/test.gff -vcf ./testdata/test.vcf.gz
+    
+or
+    
+    PeptoVar -samples SAMPLE01 -peptlen 9 -indir ./testdata
+
+
+#### Unique peptides for a pair of samples
+This example illustrates usage for the pair of samples: SAMPLE01 and SAMPLE02:
+
+    PeptoVar -samples SAMPLE01 SAMPLE02 -peptlen 9 -gff ./testdata/test.gff -vcf ./testdata/test.vcf.gz
+    
+or
+    
+    PeptoVar -samples SAMPLE01 SAMPLE02 -peptlen 9 -indir ./testdata
+
 
 ## Documentation
 

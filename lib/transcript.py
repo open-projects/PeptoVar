@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 # Copyright (C) 2017 Dmitry Malko
-# This file is part of PeptoVar (Peptides of Variations): the program for personalized and population-wide peptidome generation.
+# This file is part of PeptoVar (Peptides of Variations): the program for annotation of genomic variations and generation of variant peptides.
 #
 # PeptoVar is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -26,10 +26,11 @@ from lib.seqtools import translate, complement, is_stopcodon
 DEBUG = 0
 
 class Transcript:
-    def __init__(self, mrna_id , chrom = None, strand = None):
+    def __init__(self, across, mrna_id , chrom = None, strand = None):
         self.id = mrna_id
         self.chrom = chrom
         self.strand = strand
+        self._across = across
         self._exon_number = 0
         self._exons = [] # to handle variations at the end of CDS the last exon must include the STOP CODON !!!!
         self._backbone_head = None # the head vertebra of the backbone
@@ -243,7 +244,7 @@ class Transcript:
                                 if node1.pos == 152312604 or node2.pos == 152312604 or node3.pos == 152312604:
                                     bp=1
                             
-                            if codon.isStopCodon():
+                            if not self._across and codon.isStopCodon():
                                 continue # there is no reason to attach prefixes to untranslated codons
                             next_nodes.extend(last_node.getNext(sample))
                 codons = new_codons
