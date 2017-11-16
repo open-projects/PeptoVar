@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 # Copyright (C) 2017 Dmitry Malko
-# This file is part of PeptoVar (Peptides of Variations): the program for personalized and population-wide peptidome generation.
+# This file is part of PeptoVar (Peptides of Variations): the program for annotation of genomic variations and generation of variant peptides.
 #
 # PeptoVar is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -50,18 +50,23 @@ def main():
     input_parser = argparse.ArgumentParser(description='PeptoVar - Peptides on Variations: the program for personalization of protein coding genes and population-wide peptidome generation.')
     input_parser.add_argument('-gff', metavar='file.gff', default=None, help='GFF input file', required=False)
     input_parser.add_argument('-fasta', metavar='file.fasta', default=None, help='FASTA input file', required=False)
-    input_parser.add_argument('-vcf', metavar='file.vcf.gz', default=None, help='bgzip-compressed VCF input file (need an index file)', required=False)
+    input_parser.add_argument('-vcf', metavar='file.vcf.gz', default=None, help='bgzip-compressed VCF input file (must be indexed with tabix)', required=False)
     input_parser.add_argument('-tmpdir', metavar='dirpath', default=None, help='TEMP directory', required=False)
     input_parser.add_argument('-samples', metavar='name', nargs='+', default=list(), help='a sample name or a pair of sample names in VCF file; for two samples (donor/recipient) only unique peptides will be represented)', required=False)
     input_parser.add_argument('-tagaf', metavar='TAG_AF', default='AF', help='allele frequency tag in VCF file (for example: EUR_AF, SAS_AF, AMR_AF etc.); use with `-minaf` argument, default=AF', required=False)
     input_parser.add_argument('-minaf', metavar='THRESHOLD', type=float, default=0, help='allele frequency (AF) threshold; alleles with AF < THRESHOLD will be ignored (AF=0 will be set for alleles with no data)', required=False)
-    input_parser.add_argument('-var', metavar='all | used', choices=['all', 'used'], help='save translated polymorphisms (all or only used to make peptides)', required=False)
+    input_parser.add_argument('-var', metavar='all | nonsyn', choices=['all', 'nonsyn'], help='save translated polymorphisms: all or only nonsynonymous', required=False)
     input_parser.add_argument('-nopt', action='store_false', default=True, help='do not use optimization (may cause high CPU load and memory usage)')
     input_parser.add_argument('-peptlen', metavar='LENGTH', nargs='+', type=int, default=list(), help='lengths of peptides (0 - full-length proteins)', required=False)
     input_parser.add_argument('-outdir', metavar='dirpath', default='./output', help='output directory (will be created if not exists, default=./output)', required=False)
     input_parser.add_argument('-indir', metavar='dirpath', default=None, help='input directory for files *.vcf.gz, *.vcf.gz.tbi, *.gff and *.fasta - if no sequences in GFF file; the files MUST have the same name for each locus (chromosome)', required=False)
-    input_parser.add_argument('-trnlist', metavar='transcriptID', nargs='+', default=list(), help='list of transcriptID for processing', required=False)
+    input_parser.add_argument('-trnlist', metavar='transcriptID', nargs='+', default=list(), help='the transcriptID list for processing', required=False)
     input_parser.add_argument('-trnfile', metavar='transcriptID.txt', default=None, help='one column text file with the transcriptID list for processing', required=False)
+    input_parser.add_argument('-trnexclist', metavar='transcriptID', nargs='+', default=list(), help='the EXCLUDED transcriptID list', required=False)
+    input_parser.add_argument('-trnexclfile', metavar='transcriptID.excl.txt', default=None, help='one column text file with the EXCLUDED transcriptID list', required=False)
+    input_parser.add_argument('-across', action='store_true', default=False, help='translate across stop codons')
+    input_parser.add_argument('-frame', metavar='0 | 1 | 2', type=int, default=0, choices=[0, 1, 2], help='frame of translation; 0 - is default', required=False)
+    
     if DEBUG:
         input_parser.add_argument('-seq', metavar='file.data', default=None, help='DATA input file', required=False)
     
@@ -77,9 +82,14 @@ def main():
     tag_af = args.tagaf
     trnlist = args.trnlist
     trnfile = args.trnfile
+    trnexclist = args.trnexclist
+    trnexclfile = args.trnexclfile
+    across = args.across
+    frame = args.frame
     pept_len = args.peptlen
     pept_len.sort()
     do_prot = False
+    mode = 'MODE: annotation' if save_var else None
     if len(pept_len) and pept_len[0] == 0:
         do_prot = True
         pept_len.pop(0)
@@ -91,7 +101,7 @@ def main():
     protdb = None
     
     if not min_af:
-        cprint.printWarning("\nLow value of -minaf argument can cause high memory usage and increasing computational time!\n")
+        cprint.printWarning("\nIgnoring or low value of -minaf argument can cause high memory usage and increasing computational time!\n")
     
     tmpdir_created = 0
     if tmp_dir:
@@ -127,6 +137,7 @@ def main():
         exit()
     
     transcript_set = {}
+    transcript_exclset = {}
     transcript_num = 0
     if trnfile:
         with open(trnfile, "r") as trnlistfile:
@@ -139,23 +150,49 @@ def main():
     for trnid in trnlist:
         transcript_set[trnid] = 0
         transcript_num += 1
+        
+    if trnexclfile:
+        with open(trnexclfile, "r") as trnlistfile:
+            for line in trnlistfile:
+                trnid = line.strip()
+                if len(trnid) > 0:
+                    transcript_exclset[trnid] = 0
+                    if trnid in transcript_set:
+                        del transcript_set[trnid]
+                        transcript_num -= 1
+        trnlistfile.close()
+    for trnid in trnexclist:
+        transcript_exclset[trnid] = 0
+        if trnid in transcript_set:
+            del transcript_set[trnid]
+            transcript_num -= 1
     
     if len(samples) == 0:
         samples.append('virtual')
-        cprint.printWarning('MODE: population')
+        if mode:
+            mode += ' + population'
+        else:
+            mode = 'MODE: population'
         peptdb = UniPep(samples[0], '-', tmp_dir)
         protdb = UniPep(samples[0], '-', tmp_dir)
     elif len(samples) == 1:
-        cprint.printWarning('MODE: sample {}'.format(samples[0]))
+        if mode:
+            mode += ' + sample {}'.format(samples[0])
+        else:
+            mode = 'MODE: sample {}'.format(samples[0])
         peptdb = UniPep(samples[0], '-', tmp_dir)
         protdb = UniPep(samples[0], '-', tmp_dir)
     elif len(samples) == 2:
-        cprint.printWarning('MODE: transplantation')
+        if mode:
+            mode += ' + transplantation'
+        else:
+            mode = 'MODE: transplantation'
         peptdb = UniPep(samples[0], samples[1], tmp_dir)
         protdb = UniPep(samples[0], samples[1], tmp_dir)
     else:
         cprint.printFail("\nCan't take more than two samples\n")
         exit()
+    cprint.printWarning(mode)
     
     input_bulk = []
     if vcf_file:
@@ -191,7 +228,7 @@ def main():
             continue
         
         try:
-            gff = Gff(fileset['gff'], tmp_dir)
+            gff = Gff(fileset['gff'], frame, tmp_dir)
         except ValueError as err:
             cprint.printWarning("{} - {} ...skipped".format(fileset['gff'], err.args[0]))
             outfiles.writeWarning([fileset['gff'], err.args[0], "skipped"])
@@ -213,6 +250,9 @@ def main():
         
         for trn_id in gff.getTranscriptsID():
             try:
+                if len(transcript_exclset):
+                    if trn_id in transcript_exclset:
+                        continue
                 if len(transcript_set):
                     if trn_id not in transcript_set:
                         continue
@@ -220,7 +260,7 @@ def main():
                     transcript_num -= 1
                 
                 total_tr += 1
-                transcript = Transcript(trn_id)
+                transcript = Transcript(across, trn_id)
                 transcript.setSamples(samples)
                 
                 debugseq = None
@@ -292,7 +332,7 @@ def main():
                 
                 if optimization:
                     print("graph optimization...")
-                    if save_var == 'used':
+                    if save_var == 'nonsyn':
                         trnVariations = transcript.joinSynonymPathes()
                     else:
                         transcript.joinSynonymPathes()

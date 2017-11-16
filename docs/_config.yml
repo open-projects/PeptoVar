@@ -1,2 +1,5 @@
 theme: jekyll-theme-cayman
+title: PeptoVar
+description: PeptoVar (Peptides of Variations) - a program for annotation of genomic variants in protein coding genes and generation of variant peptides.
 show_downloads: true
+

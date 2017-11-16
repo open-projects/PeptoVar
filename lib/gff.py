@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 # Copyright (C) 2017 Dmitry Malko
-# This file is part of PeptoVar (Peptides of Variations): the program for personalized and population-wide peptidome generation.
+# This file is part of PeptoVar (Peptides of Variations): the program for annotation of genomic variations and generation of variant peptides.
 #
 # PeptoVar is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -54,11 +54,12 @@ class gffItem:
 # end of gffItem
 
 class Gff:
-    def __init__(self, gff_file, tmp_dir = '.'):
+    def __init__(self, gff_file, frame, tmp_dir = '.'):
         self._transcripts = {}
         self._tmp = tmp_dir
         self._fasta = Fasta(tmp_dir)
         self._rawseq = {}
+        self._frame = frame
         
         pos = 0
         gff = None
@@ -81,7 +82,7 @@ class Gff:
                         return
                     elif not re.match("#", line):
                         line = line.rstrip()
-                        fields = line.split()
+                        fields = line.split('\t')
                         if len(fields) == 9 and fields[2] == 'CDS':
                             item = gffItem(fields)
                             if item.parent_id:
@@ -99,8 +100,10 @@ class Gff:
             exons.sort(key=lambda x: x.beg)
             if exons[-1].strand == '-':
                 exons[-1].end -= exons[-1].phase
+                exons[-1].end -= self._frame
             else:
                 exons[0].beg += exons[0].phase
+                exons[0].beg += self._frame
     
     def attachSeq(self, file = None):
         if file:
