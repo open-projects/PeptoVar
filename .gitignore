@@ -1,0 +1,6 @@
+lib/__pycache__/
+ERROR.log
+output*
+input*
+*test*
+*tmp*

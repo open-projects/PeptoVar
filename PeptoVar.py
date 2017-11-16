@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 # Copyright (C) 2017 Dmitry Malko
-# This file is part of PeptoVar (Peptides of Variations): the program for personalized and population-wide peptidome generation.
+# This file is part of PeptoVar (Peptides of Variations): the program for annotation of genomic variations and generation of variant peptides.
 #
 # PeptoVar is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -55,7 +55,7 @@ def main():
     input_parser.add_argument('-samples', metavar='name', nargs='+', default=list(), help='a sample name or a pair of sample names in VCF file; for two samples (donor/recipient) only unique peptides will be represented)', required=False)
     input_parser.add_argument('-tagaf', metavar='TAG_AF', default='AF', help='allele frequency tag in VCF file (for example: EUR_AF, SAS_AF, AMR_AF etc.); use with `-minaf` argument, default=AF', required=False)
     input_parser.add_argument('-minaf', metavar='THRESHOLD', type=float, default=0, help='allele frequency (AF) threshold; alleles with AF < THRESHOLD will be ignored (AF=0 will be set for alleles with no data)', required=False)
-    input_parser.add_argument('-var', metavar='all | used', choices=['all', 'used'], help='save translated polymorphisms (all or only used to make peptides)', required=False)
+    input_parser.add_argument('-var', metavar='all | nonsyn', choices=['all', 'nonsyn'], help='save translated polymorphisms: all or only nonsynonymous', required=False)
     input_parser.add_argument('-nopt', action='store_false', default=True, help='do not use optimization (may cause high CPU load and memory usage)')
     input_parser.add_argument('-peptlen', metavar='LENGTH', nargs='+', type=int, default=list(), help='lengths of peptides (0 - full-length proteins)', required=False)
     input_parser.add_argument('-outdir', metavar='dirpath', default='./output', help='output directory (will be created if not exists, default=./output)', required=False)
@@ -101,7 +101,7 @@ def main():
     protdb = None
     
     if not min_af:
-        cprint.printWarning("\nLow value of -minaf argument can cause high memory usage and increasing computational time!\n")
+        cprint.printWarning("\nIgnoring or low value of -minaf argument can cause high memory usage and increasing computational time!\n")
     
     tmpdir_created = 0
     if tmp_dir:
@@ -332,7 +332,7 @@ def main():
                 
                 if optimization:
                     print("graph optimization...")
-                    if save_var == 'used':
+                    if save_var == 'nonsyn':
                         trnVariations = transcript.joinSynonymPathes()
                     else:
                         transcript.joinSynonymPathes()

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 # Copyright (C) 2017 Dmitry Malko
-# This file is part of PeptoVar (Peptides of Variations): the program for personalized and population-wide peptidome generation.
+# This file is part of PeptoVar (Peptides of Variations): the program for annotation of genomic variations and generation of variant peptides.
 #
 # PeptoVar is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -73,7 +73,7 @@ class Peptide:
         if not len(var):
             var.append('-')
         
-        return [self.chrom, self.trn_id, self.sample.name, self.sample.allele_1, self.sample.allele_2, self.getBegPos(), self.getEndPos(), '|'.join(self.fshifts), '|'.join(var), self.trn, self.mtx]
+        return [self.chrom, self.trn_id, self.sample.name, self.sample.allele_1, self.sample.allele_2, self.getBegPos(), self.getEndPos(), '|'.join(self.fshifts), '&'.join(var), self.trn, self.mtx]
 # end of Peptide
 
 class PeptideDriver:

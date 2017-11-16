@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 # Copyright (C) 2017 Dmitry Malko
-# This file is part of PeptoVar (Peptides of Variations): the program for personalized and population-wide peptidome generation.
+# This file is part of PeptoVar (Peptides of Variations): the program for annotation of genomic variations and generation of variant peptides.
 #
 # PeptoVar is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -126,8 +126,8 @@ class OutFileContainer:
                 allele_seq = trn_allele.allele.seq[::-1] if trn_var.strand == '-' else trn_allele.allele.seq
                 if prefix.sample == suffix.sample and trn_allele.allele.getSample(prefix.sample): # a sample allele must be in the native context!!!
                     prefix_fsh = '|'.join(fshift_id for fshift_id in prefix.getFShiftPathSet())
-                    prefix_var = '|'.join(prefix.getAllelesID())
-                    suffix_var = '|'.join(suffix.getAllelesID())
+                    prefix_var = '&'.join(prefix.getAllelesID())
+                    suffix_var = '&'.join(suffix.getAllelesID())
                     data = (chrom, transcript_id, var_id, str(beg), str(end), trn_allele.id, prefix.sample.name, str(prefix.sample.allele_1), str(prefix.sample.allele_2), str(syn), prefix_fsh, prefix_var, prefix.seq, allele_seq, suffix.seq, suffix_var, trn_allele.trn)
                     data_str = '_'.join(data)
                     if data_str not in wrote_data:
