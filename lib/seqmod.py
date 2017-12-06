@@ -46,7 +46,7 @@ class Seq:
             if lend < 0:
                 self._ins = list(seq)
             else:
-                self._seq[lend] = list(self._seq[lend] + seq)
+                self._seq[lend] = list(str(self._seq[lend]) + seq)
             return None
         else:
             print("ERROR: seq.beg > seq.end {}..{}".format(lbeg, lend))
