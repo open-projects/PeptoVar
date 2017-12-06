@@ -96,6 +96,9 @@ class PeptideDriver:
     def copy(self):
         new_driver = copy(self)
         self._alleles = self._alleles.copy()
+        self._peptides = self._peptides.copy()
+        self._len_set = self._len_set.copy()
+        
         return new_driver
     
     def setPeptContainer(self, container):
