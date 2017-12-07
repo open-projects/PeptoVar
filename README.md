@@ -56,6 +56,10 @@ or
     
     PeptoVar.py -peptlen 9 10 11 -indir ./testdata
     
+<<<<<<< HEAD
+=======
+
+>>>>>>> master
 
 #### Peptides for a sample
 This example illustrates usage for sample SAMPLE01:
