@@ -32,6 +32,12 @@ class TrnAllele:
         self.mtx = mtx
         self.trn = trn
         self.sample_names = set(sample.name for sample in allele.getSamples())
+        self.is_indel = allele.isInDel()
+    
+    def __eq__(self, key):
+        if self.id == key.id and self.trn_id == key.trn_id and self.context == key.context and self.mtx == key.mtx and self.trn == key.trn and self.sample_names == key.sample_names:
+            return True
+        return False
 # end of TrnAllele
 
 class TrnVariation:
@@ -48,18 +54,30 @@ class TrnVariation:
         self._allele_usage = {}
         self._allele_rank = {}
         self._sample_names = set()
+        self.is_indel = False
     
     def appendTrnAllele(self, trn_allele):
-        if not trn_allele.context in self._alleles_in_context:
-            self._alleles_in_context[trn_allele.context] = {}
-        if not trn_allele.trn in self._alleles_in_context[trn_allele.context]:
-            self._alleles_in_context[trn_allele.context][trn_allele.trn] = []
-        self._alleles_in_context[trn_allele.context][trn_allele.trn].append(trn_allele)
-        if trn_allele.allele.isReference():
-            self.ref_allele_id = trn_allele.id
         if not trn_allele.id in self._alleles:
             self._alleles[trn_allele.id] = []
+        elif trn_allele in self._alleles[trn_allele.id]:
+            return None
+        
         self._alleles[trn_allele.id].append(trn_allele)
+        if trn_allele.is_indel:
+            self.is_indel = True
+        
+        if not trn_allele.context in self._alleles_in_context:
+            self._alleles_in_context[trn_allele.context] = {}
+        allele_trn = trn_allele.trn
+        if trn_allele.allele.seq == '-':
+            allele_trn += "'"
+        if not allele_trn in self._alleles_in_context[trn_allele.context]:
+            self._alleles_in_context[trn_allele.context][allele_trn] = []
+        self._alleles_in_context[trn_allele.context][allele_trn].append(trn_allele)
+        
+        if trn_allele.allele.isReference():
+            self.ref_allele_id = trn_allele.id
+        
         self._sample_names = self._sample_names.union(trn_allele.sample_names)
         return None
         

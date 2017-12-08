@@ -147,11 +147,13 @@ class Exon:
                     end_node = None
                     
                     for pos, nucl in enumerate(allele_seq):
-                        pos = snp.beg + pos
+                        #pos = snp.beg + pos
+                        pos = beg_host.pos + pos
                         pos_overhead = 0
-                        if snp.end < pos:
-                            pos_overhead = pos - snp.end
-                            pos = snp.end
+                        #if snp.end < pos:
+                        if end_host.pos < pos:
+                            pos_overhead = pos - end_host.pos
+                            pos = end_host.pos
                         new_node = Node(pos, pos_overhead, nucl, allele)
                         if end_node:
                             end_node.setNext([new_node])
