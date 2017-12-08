@@ -96,7 +96,6 @@ class PeptideDriver:
     def copy(self):
         new_driver = copy(self)
         self._alleles = self._alleles.copy()
-        self._peptides = self._peptides.copy()
         self._len_set = self._len_set.copy()
         
         return new_driver
@@ -121,7 +120,7 @@ class PeptideDriver:
         if self._len is not None:
             pos = node.getPos()
             
-            if DEBUG and pos['pos'] == 154405021:
+            if DEBUG and pos['pos'] == 7520461:
                 bp=1
             
             # peptide position is determined as a "variation shadow" on the genome sequence
