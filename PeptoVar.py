@@ -37,7 +37,7 @@ from lib.variation import SNP
 from lib.seqtools import PeptComparator
 from lib.comparator import UniPep
 
-DEBUG = 0
+DEBUG = 1
 
 if DEBUG:
     from lib.seqmod import Sequence
@@ -288,6 +288,7 @@ def main():
                 appended_snp = set()
                 for exon in transcript.getExons():
                     for var in vcf.fetch(exon.chrom, exon.beg - 2, exon.end):
+                        print(var.id)
                         if var.id in appended_snp:
                             cprint.printWarning("{} duplicated variation ID ...skipped".format(var.id))
                             outfiles.writeWarning([var.id, "duplicated variation ID", "skipped"])
@@ -336,6 +337,8 @@ def main():
                         trnVariations = transcript.joinSynonymPathes()
                     else:
                         transcript.joinSynonymPathes()
+                
+                transcript.findFrameShifts()
                 
                 if save_var: # save translated alleles in file
                     print("variation processing...")

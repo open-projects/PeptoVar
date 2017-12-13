@@ -54,12 +54,14 @@ class gffItem:
 # end of gffItem
 
 class Gff:
-    def __init__(self, gff_file, frame, tmp_dir = '.'):
+    def __init__(self, gff_file, frame, tail_len = 0, tmp_dir = '.'):
         self._transcripts = {}
         self._tmp = tmp_dir
         self._fasta = Fasta(tmp_dir)
         self._rawseq = {}
         self._frame = frame
+        self._tail_len = tail_len
+        self._tail_exon = None
         
         pos = 0
         gff = None
@@ -104,6 +106,11 @@ class Gff:
             else:
                 exons[0].beg += exons[0].phase
                 exons[0].beg += self._frame
+        if exons[-1].strand == '-':
+            pass
+        else:
+            exons[-1].beg += 1
+            exons[-1].end += self._tail_len
     
     def attachSeq(self, file = None):
         if file:

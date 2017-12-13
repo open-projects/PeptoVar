@@ -147,6 +147,13 @@ class Node:
     
     def getPos(self):
         return {'pos': self.pos, 'overpos': self.overpos, 'id': self._allele_id}
+    
+    def isAltStop(self):
+        for allele in self._alleles:
+            if allele.isAltStop():
+                return True
+        return False
+        
 # end of Node
 
 class Vertebra:

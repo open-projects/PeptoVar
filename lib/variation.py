@@ -34,6 +34,7 @@ class Allele:
         self._fshift = False
         self._samples = SampleContainer()
         self._phased = set() # samples for which the allele is phased
+        self._alt_stop = False
     
     def _get_id(self):
         return ":".join((self.snp_id.lower(), self.seq.upper())) + ("=" + str(self.freq) if self.freq else "") + ("(ref)" if self._is_ref else "(alt)")
@@ -44,6 +45,12 @@ class Allele:
             self.seq = '-'
         self.length -= 1
         self.id = self._get_id()
+    
+    def setAltStop(self):
+        self._alt_stop = True
+        
+    def isAltStop(self):
+        return self._alt_stop
     
     def setFreq(self, freq):
         self.freq = freq

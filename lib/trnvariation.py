@@ -33,6 +33,7 @@ class TrnAllele:
         self.trn = trn
         self.sample_names = set(sample.name for sample in allele.getSamples())
         self.is_indel = allele.isInDel()
+        self.alt_stop = False
     
     def __eq__(self, key):
         if self.id == key.id and self.trn_id == key.trn_id and self.context == key.context and self.mtx == key.mtx and self.trn == key.trn and self.sample_names == key.sample_names:
@@ -55,6 +56,7 @@ class TrnVariation:
         self._allele_rank = {}
         self._sample_names = set()
         self.is_indel = False
+        self.alt_stop = False
     
     def appendTrnAllele(self, trn_allele):
         if not trn_allele.id in self._alleles:
@@ -69,6 +71,9 @@ class TrnVariation:
         if not trn_allele.context in self._alleles_in_context:
             self._alleles_in_context[trn_allele.context] = {}
         allele_trn = trn_allele.trn
+        if allele_trn == '*':
+            self.alt_stop = True
+        
         if trn_allele.allele.seq == '-':
             allele_trn += str(0)
         else: # different lengths can be translated in the same amino acid(s)
@@ -92,6 +97,13 @@ class TrnVariation:
     def joinSynonymAlleles(self):
         if DEBUG and self.id == 'rs1130929':
             bp=1
+        
+        if self.alt_stop:
+            for trn_allele in self._alleles.itervalues():
+                if trn_allele.trn != '*':
+                    trn_allele.alt_stop = True
+                    trn_allele.allele.setAltStop()
+                    trn_allele.allele.id = '{' + trn_allele.allele.id + '}'
         
         # may be not necessary
         context_list = list(self._alleles_in_context.keys())

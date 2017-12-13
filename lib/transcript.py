@@ -151,12 +151,13 @@ class Transcript:
             backbone_item = backbone_item.getNext()
         
         for sample in self._samples:
-            self._findFrameShifts(sample)
+            #self._findFrameShifts(sample)
             nodes = self._attachPrefixes(sample)
             self._codon_start_nodes.append((sample, nodes))
         return self._codon_start_nodes
     
-    def _findFrameShifts(self, sample):
+    #def _findFrameShifts(self, sample):
+    def findFrameShifts(self):
         def pathFinder(path):
             node = path['node']
             frame = path['frame']
@@ -167,13 +168,13 @@ class Transcript:
                     frame += 1
                 if frame > 2: frame = 0
                 
-                if node.isFrameShift():
+                if node.isFrameShift() or node.isAltStop():
                     fshift_path = fshift_path.clonePath()
                     if DEBUG:
                         print(fshift_path.id)
                     fsh_allele_id = []
                     for allele in node.getAlleles(): # don't use node.getAlleleID(): the node could belong to two and more alleles!
-                        if allele.isFrameShift():
+                        if allele.isFrameShift() or allele.isAltStop():
                             fsh_allele_id.append(allele.id)
                     fshift_path.appendAlleleID(fsh_allele_id)
                 for next_node in node.getNext(sample):
@@ -185,17 +186,18 @@ class Transcript:
             return next_path
         # end of pathFinder()
         
-        tree = []
-        fshift_startpath = FShiftPath(sample.id)
-        for node in self._graph_start.getNext(sample):
-            node.appendFShiftPath(fshift_startpath)
-            tree.append({'node': node, 'frame': 0, 'fsh_path': fshift_startpath})
-        while len(tree):
-            new_tree = []
-            for path in tree:
-                new_path = pathFinder(path)
-                new_tree.extend(new_path)
-            tree = new_tree
+        for sample in self._samples:
+            tree = []
+            fshift_startpath = FShiftPath(sample.id)
+            for node in self._graph_start.getNext(sample):
+                node.appendFShiftPath(fshift_startpath)
+                tree.append({'node': node, 'frame': 0, 'fsh_path': fshift_startpath})
+            while len(tree):
+                new_tree = []
+                for path in tree:
+                    new_path = pathFinder(path)
+                    new_tree.extend(new_path)
+                tree = new_tree
     
     def _attachPrefixes(self, sample):
         def prefixDriver(node1): # node1 is the first nucleotide in the codon
