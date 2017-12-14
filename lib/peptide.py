@@ -52,7 +52,7 @@ class Peptide:
     def _strpos(self, pos):
         if pos:
             if pos['overpos']:
-                return "{}+{}({})".format(pos['pos'], pos['overpos'], pos['id'])
+                return "{}+{}({})".format(pos['pos'], int(pos['overpos']), pos['id'])
             else:
                 return str(pos['pos'])
         return '0'
