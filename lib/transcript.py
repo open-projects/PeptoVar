@@ -207,6 +207,7 @@ class Transcript:
                 vertebra1 = node1.getVertebra()
                 if vertebra1:
                     vertebra1.appendSample(sample)
+                node1.attachPrefix(CodonEmptyPrefix(sample, node1))
                 return node1.getNext(sample)
             
             codons = [Codon(node1)]
@@ -214,39 +215,41 @@ class Transcript:
                 new_codons = []
                 for codon in codons:
                     last_node = codon.getLast()
+                    if last_node.pos >= 7842660:
+                        bp=1
                     vertebra = last_node.getVertebra()
                     if vertebra:
                         vertebra.appendSample(sample)
                     
-                    if last_node.nucl == '-':
+                    #if last_node.nucl == '-':
+                    #    for next_node in last_node.getNext(sample):
+                    #        new_codons.append(codon.extend(next_node))
+                    #else:
+                    if codon.length() <= 1:
+                        last_node.attachPrefix(CodonEmptyPrefix(sample, last_node))
                         for next_node in last_node.getNext(sample):
                             new_codons.append(codon.extend(next_node))
-                    else:
-                        if codon.length() == 1:
-                            last_node.attachPrefix(CodonEmptyPrefix(sample, last_node))
-                            for next_node in last_node.getNext(sample):
-                                new_codons.append(codon.extend(next_node))
-                        elif codon.length() == 2:
-                            last_node.attachPrefix(CodonPrefix(sample, codon.getUpstreamNodes()))
-                            for next_node in last_node.getNext(sample):
-                                new_codons.append(codon.extend(next_node))
-                        elif codon.length() == 3:
-                            last_node.attachPrefix(CodonPrefix(sample, codon.getUpstreamNodes()))
-                            
-                            if DEBUG:
-                                node1 = codon.getNuclNode(1)
-                                node2 = codon.getNuclNode(2)
-                                node3 = codon.getNuclNode(3)
-                                alleles1 = ",".join(allele.id for allele in node1.getAlleles())
-                                alleles2 = ",".join(allele.id for allele in node2.getAlleles())
-                                alleles3 = ",".join(allele.id for allele in node3.getAlleles())
-                                print("{} pos:{}({})/{}/{} codon:{} alleles:{}/{}/{}".format(sample.id, node1.pos, node1.overpos, node2.pos, node3.pos, "".join((node1.nucl, node2.nucl , node3.nucl)), alleles1 if alleles1 else '-', alleles2 if alleles2 else '-', alleles3 if alleles3 else '-'))
-                                if node1.pos == 152312604 or node2.pos == 152312604 or node3.pos == 152312604:
-                                    bp=1
-                            
-                            if not self._across and codon.isStopCodon():
-                                continue # there is no reason to attach prefixes to untranslated codons
-                            next_nodes.extend(last_node.getNext(sample))
+                    elif codon.length() == 2:
+                        last_node.attachPrefix(CodonPrefix(sample, codon.getUpstreamNodes()))
+                        for next_node in last_node.getNext(sample):
+                            new_codons.append(codon.extend(next_node))
+                    elif codon.length() == 3:
+                        last_node.attachPrefix(CodonPrefix(sample, codon.getUpstreamNodes()))
+                        
+                        if DEBUG:
+                            node1 = codon.getNuclNode(1)
+                            node2 = codon.getNuclNode(2)
+                            node3 = codon.getNuclNode(3)
+                            alleles1 = ",".join(allele.id for allele in node1.getAlleles())
+                            alleles2 = ",".join(allele.id for allele in node2.getAlleles())
+                            alleles3 = ",".join(allele.id for allele in node3.getAlleles())
+                            print("{} pos:{}({})/{}/{} codon:{} alleles:{}/{}/{}".format(sample.id, node1.pos, node1.overpos, node2.pos, node3.pos, "".join((node1.nucl, node2.nucl , node3.nucl)), alleles1 if alleles1 else '-', alleles2 if alleles2 else '-', alleles3 if alleles3 else '-'))
+                            if node1.pos == 152312604 or node2.pos == 152312604 or node3.pos == 152312604:
+                                bp=1
+                        
+                        if not self._across and codon.isStopCodon():
+                            continue # there is no reason to attach prefixes to untranslated codons
+                        next_nodes.extend(last_node.getNext(sample))
                 codons = new_codons
             node1.setUsed() # mark the node as `used`
             self._used_nodes.append(node1) # save used nodes to clean the marks before the next run
