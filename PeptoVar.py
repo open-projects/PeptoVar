@@ -27,7 +27,7 @@ import shutil
 try:
     from pysam import VariantFile, VariantHeader
 except:
-    cprint.printFail("\nCan't parse VCF file. Please, install pysam module for python3\n")
+    print("\nCan't parse VCF file. Please, install pysam module for python3\n")
     exit()
 from lib.gff import Gff
 from lib.transcript import Transcript
