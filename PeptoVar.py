@@ -221,7 +221,9 @@ def main():
             continue
         
         try:
-            vcf.fetch('test', 1, 2) # just to check vcf health
+            #vcf.fetch('1', 1, 2) # just to check vcf health
+            tmp_file = open(fileset['vcf'] + '.tbi')
+            tmp_file.close()
         except:
             cprint.printWarning("{} - no index file (use tabix) ...skipped".format(fileset['vcf']))
             outfiles.writeWarning([fileset['vcf'], "no index file (use tabix)", "skipped"])
