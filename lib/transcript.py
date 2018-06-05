@@ -167,7 +167,7 @@ class Transcript:
                     frame += 1
                 if frame > 2: frame = 0
                 
-                if node.isFrameShift():
+                if node.isFrameShift() and not node.isReference():
                     fshift_path = fshift_path.clonePath()
                     if DEBUG:
                         print(fshift_path.id)
