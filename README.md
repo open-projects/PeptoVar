@@ -14,7 +14,7 @@ PeptoVar is a program for annotation of genomic variants in protein coding genes
    - personalized peptidome for a sample (phased and unphased data can be used)
    - unique peptides for a pair of samples
 
-The PeptoVar annotation for human peptides is accessible on-line as PeptoVarDB: [http://www.peptovar.online](http://www.peptovar.online).
+The PeptoVar annotation for human peptides is accessible online as PeptoVarDB: [http://www.peptovar.online](http://www.peptovar.online).
 
 ## The PeptoVar project was supported by RFBR, project number 17-04-02186.
 
