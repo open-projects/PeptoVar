@@ -9,7 +9,7 @@ PeptoVar is a program for annotation of genomic variants in protein coding genes
 - Annotation of variants:
    - comprehensive information of potential compound effects of combining alternate alleles across multiple variant loci
 
-- Variant peptides:
+- Annotation of peptides:
    - variant peptides of a population
    - personalized peptidome for a sample (phased and unphased data can be used)
    - unique peptides for a pair of samples
