@@ -130,7 +130,7 @@ class Exon:
                             ref_node = vertebra.getRefNode()
                             ref_node.appendAllele(allele)
                             vertebra.addNodeToGraph(ref_node)
-                            if allele_seq[allele_pos] != ref_node.nucl:
+                            if allele_seq[allele_pos] != ref_node.nucl.upper():
                                 raise ValueError("reference allele mismatch")
                             if allele_pos > 0:
                                 fibro = vertebra.getBefore()
